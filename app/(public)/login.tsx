@@ -36,7 +36,6 @@ export default function LoginScreen() {
     try {
       setIsLoading(true);
       await login(email, password);
-      // O redirecionamento será feito pelo AuthContext após login bem-sucedido
     } catch (error) {
       console.error("Erro no login:", error);
       Alert.alert(

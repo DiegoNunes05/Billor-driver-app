@@ -29,7 +29,6 @@ export default function SignupScreen() {
   const {signup} = useAuth();
 
   const handleSignup = async () => {
-    // Validações básicas
     if (!name || !email || !password || !confirmPassword) {
       Alert.alert("Erro", "Por favor, preencha todos os campos.");
       return;
@@ -40,14 +39,12 @@ export default function SignupScreen() {
       return;
     }
 
-    // Validação de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       Alert.alert("Erro", "Por favor, insira um email válido.");
       return;
     }
 
-    // Validação de senha
     if (password.length < 6) {
       Alert.alert("Erro", "A senha deve ter no mínimo 6 caracteres.");
       return;

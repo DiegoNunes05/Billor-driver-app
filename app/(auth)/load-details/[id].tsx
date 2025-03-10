@@ -17,38 +17,8 @@ import {documentsApi, loadsApi} from "@/services/api";
 import * as ImagePicker from "expo-image-picker";
 import Header from "@/components/Header";
 import ChatButton from "@/components/ChatButton";
-
-interface Load {
-  id: string;
-  origin: string;
-  destination: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  status: "pending" | "in_progress" | "completed";
-  pickupDate: string;
-  deliveryDate: string;
-  weight: number;
-  items: number;
-  description: string;
-  clientName: string;
-  clientPhone: string;
-  paymentValue: number;
-  paymentStatus: string;
-  distance: number;
-  documents: any[];
-}
-
-interface Document {
-  id: string;
-  name: string;
-  imageUrl: string;
-  uri: string;
-  uploadDate: string; 
-  type: "pickup_receipt" | "delivery_receipt" | "other";
-  status: "pending" | "approved" | "rejected";
-}
+import Toast from "react-native-toast-message";
+import {Load, Document} from "@/types/types";
 
 export default function LoadDetailsScreen() {
   const {id} = useLocalSearchParams();
@@ -98,22 +68,26 @@ export default function LoadDetailsScreen() {
       setLoading(true);
       await loadsApi.updateStatus(load.id, newStatus);
 
-      // Atualizar o estado local
       setLoad({...load, status: newStatus});
 
-      Alert.alert(
-        "Status atualizado",
-        `Carga marcada como ${
+      Toast.show({
+        type: "success",
+        text1: "Status Atualizado",
+        text2: `Carga marcada como ${
           newStatus === "pending"
             ? "pendente"
             : newStatus === "in_progress"
             ? "em andamento"
             : "concluída"
-        }.`
-      );
+        }`,
+      });
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
-      Alert.alert("Erro", "Não foi possível atualizar o status da carga.");
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "Não foi possível atualizar o status da carga.",
+      });
     } finally {
       setLoading(false);
     }
@@ -198,13 +172,18 @@ export default function LoadDetailsScreen() {
               setShowImageModal(false);
               setSelectedDocument(null);
 
-              Alert.alert("Sucesso", "Documento excluído com sucesso!");
+              Toast.show({
+                type: "success",
+                text1: "Sucesso",
+                text2: "Documento excluído com sucesso!",
+              });
             } catch (error) {
               console.error("Erro ao excluir documento:", error);
-              Alert.alert(
-                "Erro",
-                "Não foi possível excluir o documento. Tente novamente."
-              );
+              Toast.show({
+                type: "error",
+                text1: "Erro",
+                text2: "Não foi possível excluir o documento. Tente novamente.",
+              });
             } finally {
               setLoading(false);
             }
@@ -258,20 +237,29 @@ export default function LoadDetailsScreen() {
           const docsResponse = await documentsApi.getByLoadId(id as string);
           setDocuments(docsResponse.data);
 
-          Alert.alert("Sucesso", "Documento enviado com sucesso!");
+          Toast.show({
+            type: "success",
+            text1: "Sucesso",
+            text2: "Documento enviado com sucesso.",
+          });
         } catch (error) {
           console.error("Erro ao enviar documento:", error);
-          Alert.alert(
-            "Erro",
-            "Não foi possível enviar o documento. Tente novamente."
-          );
+          Toast.show({
+            type: "error",
+            text1: "Erro",
+            text2: "Não foi possível enviar o documento. Tente novamente.",
+          });
         } finally {
           setLoading(false);
         }
       }
     } catch (error) {
       console.error("Erro ao capturar imagem:", error);
-      Alert.alert("Erro", "Não foi possível capturar a imagem.");
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "Não foi possível capturar a imagem.",
+      })
     }
   };
 
@@ -296,7 +284,6 @@ export default function LoadDetailsScreen() {
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const asset = result.assets[0];
 
-        // Preparar os dados do documento
         const newDocument = {
           loadId: id,
           type: documentType,
@@ -307,28 +294,35 @@ export default function LoadDetailsScreen() {
         };
 
         try {
-          // Enviar o documento para a API
           setLoading(true);
           await documentsApi.uploadDocument(newDocument);
 
-          // Atualizar a lista de documentos
           const docsResponse = await documentsApi.getByLoadId(id as string);
           setDocuments(docsResponse.data);
 
-          Alert.alert("Sucesso", "Documento enviado com sucesso!");
+          Toast.show({
+            type: "success",
+            text1: "Sucesso",
+            text2: "Documento enviado com sucesso!",
+          });
         } catch (error) {
           console.error("Erro ao enviar documento:", error);
-          Alert.alert(
-            "Erro",
-            "Não foi possível enviar o documento. Tente novamente."
-          );
+          Toast.show({
+            type: "error",
+            text1: "Erro",
+            text2: "Não foi possível enviar o documento. Tente novamente.",
+          })
         } finally {
           setLoading(false);
         }
       }
     } catch (error) {
       console.error("Erro ao selecionar imagem:", error);
-      Alert.alert("Erro", "Não foi possível selecionar a imagem.");
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "Não foi possível selecionar a imagem.",
+      });
     }
   };
 
@@ -703,15 +697,6 @@ export default function LoadDetailsScreen() {
             </View>
           )}
 
-          {load.status === "in_progress" && (
-            <TouchableOpacity
-              style={styles.documentButton}
-              onPress={() => router.push(`/(auth)/upload-document/${load.id}`)}
-            >
-              <Ionicons name="camera" size={18} color="#FFFFFF" />
-              <Text style={styles.documentButtonText}>Enviar Comprovante</Text>
-            </TouchableOpacity>
-          )}
         </View>
       </ScrollView>
       <View style={styles.chatButtonContainer}>
@@ -1064,18 +1049,17 @@ const styles = StyleSheet.create({
   addDocumentButton: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
     backgroundColor: "#324c6e",
-    paddingVertical: 12,
+    paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 8,
+    borderRadius: 4,
+    alignSelf: "flex-start",
     marginTop: 12,
   },
   addDocumentButtonText: {
     color: "#FFFFFF",
-    fontWeight: "bold",
-    fontSize: 16,
     marginLeft: 8,
+    fontWeight: "500",
   },
   modalOverlay: {
     flex: 1,

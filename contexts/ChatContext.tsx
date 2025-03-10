@@ -47,7 +47,6 @@ export const ChatProvider = ({children}: {children: ReactNode}) => {
   const [currentChatId, setCurrentChatId] = useState("support");
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // Buscar mensagens não lidas
   useEffect(() => {
     if (!user) return;
 

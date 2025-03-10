@@ -1,4 +1,3 @@
-// /(public)/forgot-password.tsx
 import React, {useState} from "react";
 import {
   View,
@@ -30,7 +29,6 @@ export default function ForgotPasswordScreen() {
       return;
     }
 
-    // Validação de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       Alert.alert("Erro", "Por favor, insira um e-mail válido.");

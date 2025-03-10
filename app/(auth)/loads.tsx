@@ -16,29 +16,7 @@ import {router} from "expo-router";
 import {loadsApi} from "../../services/api";
 import Header from "@/components/Header";
 import ChatButton from "@/components/ChatButton";
-
-// Tipo para representar uma carga da API
-interface Load {
-  id: string;
-  origin: string;
-  destination: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  status: "pending" | "in_progress" | "completed";
-  pickupDate: string;
-  deliveryDate: string;
-  weight: number;
-  items: number;
-  description: string;
-  clientName: string;
-  clientPhone: string;
-  paymentValue: number;
-  paymentStatus: string;
-  distance: number;
-  documents: any[];
-}
+import { Load } from "@/types/types";
 
 export default function LoadsScreen() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -109,8 +87,7 @@ export default function LoadsScreen() {
       if (inProgressLoads.length === 0) {
         return;
       }
-
-      // Perguntar ao usuário se deseja finalizar todas as entregas em andamento
+      
       Alert.alert(
         "Finalizar entregas",
         `Você tem ${inProgressLoads.length} entrega(s) em andamento. Deseja marcar como concluídas?`,
@@ -123,14 +100,11 @@ export default function LoadsScreen() {
             text: "Finalizar",
             onPress: async () => {
               setLoading(true);
-
               try {
-                // Atualizar o status de todas as cargas em andamento para concluído
+
                 for (const load of inProgressLoads) {
                   await loadsApi.updateStatus(load.id, "completed");
                 }
-
-                // Atualizar a lista de cargas
                 fetchLoads();
 
                 Alert.alert("Sucesso", "Entregas finalizadas com sucesso!");
@@ -153,14 +127,14 @@ export default function LoadsScreen() {
   };
 
   const renderLoadItem = ({item}: {item: Load}) => {
-    let statusColor = "#FFC107"; // Amarelo para pendente
+    let statusColor = "#FFC107"; 
     let statusIcon = "time-outline";
 
     if (item.status === "in_progress") {
-      statusColor = "#2196F3"; // Azul para em andamento
+      statusColor = "#2196F3"; 
       statusIcon = "arrow-forward";
     } else if (item.status === "completed") {
-      statusColor = "#4CAF50"; // Verde para concluído
+      statusColor = "#4CAF50"; 
       statusIcon = "checkmark-circle";
     }
 

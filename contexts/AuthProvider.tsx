@@ -45,7 +45,6 @@ export const AuthContext = createContext<AuthContextData>(
   {} as AuthContextData
 );
 
-// contexts/AuthProvider.tsx
 export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
   children,
 }) => {

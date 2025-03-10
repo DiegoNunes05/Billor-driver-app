@@ -8,7 +8,7 @@
       "city": "Rio de Janeiro",
       "state": "RJ",
       "zipCode": "20940-070",
-      "status": "completed",
+      "status": "in_progress",
       "pickupDate": "2023-06-15T10:00:00",
       "deliveryDate": "2023-06-16T14:00:00",
       "weight": 350,
@@ -29,7 +29,7 @@
       "city": "Brasília",
       "state": "DF",
       "zipCode": "71200-030",
-      "status": "in_progress",
+      "status": "pending",
       "pickupDate": "2023-06-14T08:30:00",
       "deliveryDate": "2023-06-15T16:00:00",
       "weight": 520,
@@ -38,7 +38,7 @@
       "clientName": "Construtora XYZ",
       "clientPhone": "(61) 97654-3210",
       "paymentValue": 1200,
-      "paymentStatus": "paid",
+      "paymentStatus": "pending",
       "distance": 716,
       "documents": []
     },
@@ -59,7 +59,7 @@
       "clientName": "Distribuidora Alimentos Sul",
       "clientPhone": "(51) 98877-6655",
       "paymentValue": 680,
-      "paymentStatus": "paid",
+      "paymentStatus": "pending",
       "distance": 546,
       "documents": []
     },
@@ -71,7 +71,7 @@
       "city": "Recife",
       "state": "PE",
       "zipCode": "50040-000",
-      "status": "pending",
+      "status": "in_progress",
       "pickupDate": "2023-06-17T11:00:00",
       "deliveryDate": "2023-06-18T14:00:00",
       "weight": 420,
@@ -92,7 +92,7 @@
       "city": "Natal",
       "state": "RN",
       "zipCode": "59064-000",
-      "status": "in_progress",
+      "status": "pending",
       "pickupDate": "2023-06-15T07:45:00",
       "deliveryDate": "2023-06-16T10:00:00",
       "weight": 190,
@@ -116,7 +116,8 @@
       "licenseExpiry": "2025-05-15",
       "vehicle": "Caminhão - Mercedez-Benz 1620",
       "plate": "ABC1234",
-      "status": "active"
+      "status": "active",
+      "photoUrl": "https://exemplo.com/caminho/para/foto.jpg"
     }
   ],
   "documents": [
@@ -135,6 +136,15 @@
       "imageUrl": "https://example.com/documents/delivery_3.jpg",
       "uploadDate": "2023-06-11T12:45:00",
       "status": "approved"
+    },
+    {
+      "id": "c2c2",
+      "loadId": "2",
+      "type": "delivery_receipt",
+      "name": "Comprovante_2",
+      "imageUrl": "file:///var/mobile/Containers/Data/Application/7D267B26-8C15-4ADE-8FDA-3C1288E37FF2/Library/Caches/ExponentExperienceData/@nunes_05/Billor-Driver-app/ImagePicker/7671CB98-6387-481B-8DF7-F9C7F2EDAF23.jpg",
+      "uploadDate": "2025-03-10T18:41:13.818Z",
+      "status": "pending"
     }
   ],
   "messages": [

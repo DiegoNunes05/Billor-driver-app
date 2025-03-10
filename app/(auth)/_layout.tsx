@@ -34,11 +34,13 @@ export default function AppLayout() {
         },
         headerStyle: {
           backgroundColor: "#324c6e",
-          height: Platform.OS === "android" ? 55 : 90,
+          height: Platform.OS === "android" ? 55 : 100,
+          
         },
         headerTintColor: "white",
         headerTitleStyle: {
           fontWeight: "bold",
+          marginBottom: 5,
         },
         headerTitleAlign: "center",
       }}

@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   },
   skipButton: {
     position: "absolute",
-    top: Platform.OS === "android" ? 30 : 50,
+    top: Platform.OS === "android" ? 30 : 60,
     right: 20,
     padding: 10,
     backgroundColor: "rgba(0, 0, 0, .1)",

@@ -9,24 +9,27 @@ module.exports = {
     splash: {
       image: "./assets/splash-icon.png",
       resizeMode: "contain",
-      backgroundColor: "#ffffff"
+      backgroundColor: "#ffffff",
     },
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "br.com.billor.driver"
+      bundleIdentifier: "br.com.billor.driver",
     },
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
-        backgroundColor: "#ffffff"
-      }
+        backgroundColor: "#ffffff",
+      },
     },
     web: {
-      favicon: "./assets/favicon.png"
+      favicon: "./assets/favicon.png",
     },
-    plugins: [
-      "expo-router"
-    ],
-    scheme: "billor-driver-app"
-  }
+    extra: {
+      eas: {
+        projectId: "e7abb556-fcaa-449d-a377-20ea138e82b8",
+      },
+    },
+    plugins: ["expo-router", "expo-build-properties"],
+    scheme: "billor-driver-app",
+  },
 };

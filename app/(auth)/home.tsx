@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,16 +10,49 @@ import {
   Dimensions,
   Platform,
 } from "react-native";
-import {router} from "expo-router";
+import {router, useFocusEffect} from "expo-router";
 import Header from "@/components/Header";
 import ChatButton from "@/components/ChatButton";
 import { useAuth } from "@/hooks/useAuth";
+import { loadsApi } from "@/services/api";
+import { Load } from "@/types/types";
+import LineBillor from "@/components/lineBillor";
 
 const {width} = Dimensions.get("window");
 const imageSize = Platform.OS === "android" ? Math.min(width * 0.9, 280) : 320;
 
 export default function HomeScreen() {
   const {user} = useAuth(); 
+  const [completedDeliveries, setCompletedDeliveries] = useState(0);
+  const [totalKilometers, setTotalKilometers] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchCompletedDeliveries = async () => {
+        try {
+          const response = await loadsApi.getCompletedLoads();
+
+          const deliveriesCount = response.data.length;
+          setCompletedDeliveries(deliveriesCount);
+
+          const totalKm = response.data.reduce(
+            (sum: number, load: Load) => sum + (load.distance || 0),
+            0
+          );
+          setTotalKilometers(Math.round(totalKm));
+        } catch (error) {
+          console.error("Erro ao buscar entregas concluídas:", error);
+          setCompletedDeliveries(0);
+          setTotalKilometers(0);
+        }
+      };
+
+      if (user) {
+        fetchCompletedDeliveries();
+      }
+    }, [user])
+  );
+
   const handleLoads = () => {
     router.push("/(auth)/loads");
   };
@@ -31,14 +64,15 @@ export default function HomeScreen() {
       <Header />
       <ScrollView style={styles.contentFlexGrow}>
         <View style={styles.viewTruck}>
-          <Image
-            source={{
-              uri: "https://res.cloudinary.com/dnukxp5ng/image/upload/v1741453323/caminhao-de-transporte-desenhado-a-mao_ezk2cn.png",
-            }}
-            style={styles.truckImage}
-            resizeMode="contain"
-          />
+            <Image
+              source={{
+                uri: "https://res.cloudinary.com/dnukxp5ng/image/upload/v1741453323/caminhao-de-transporte-desenhado-a-mao_ezk2cn.png",
+              }}
+              style={styles.truckImage}
+              resizeMode="contain"
+            />
         </View>
+        <LineBillor />
 
         <View style={styles.content}>
           <View style={styles.summaryCard}>
@@ -46,14 +80,14 @@ export default function HomeScreen() {
 
             <View style={styles.summaryContent}>
               <View style={styles.summaryItem}>
-                <Text style={styles.summaryValue}>0</Text>
+                <Text style={styles.summaryValue}>{completedDeliveries}</Text>
                 <Text style={styles.summaryLabel}>Entregas</Text>
               </View>
 
               <View style={styles.divider} />
 
               <View style={styles.summaryItem}>
-                <Text style={styles.summaryValue}>0</Text>
+                <Text style={styles.summaryValue}>{totalKilometers}</Text>
                 <Text style={styles.summaryLabel}>Km Percorridos</Text>
               </View>
             </View>
@@ -141,6 +175,7 @@ const styles = StyleSheet.create({
   },
   viewTruck: {
     alignItems: "flex-end",
+    zIndex: 10,
   },
   truckImage: {
     width: imageSize,

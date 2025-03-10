@@ -1,7 +1,7 @@
-// Versão simplificada do AuthContext.tsx sem dependência de getState
 import React, {createContext, useState, useEffect, ReactNode} from "react";
 import {onAuthStateChanged, updateEmail, updateProfile} from "firebase/auth";
 import {router} from "expo-router";
+import Toast from "react-native-toast-message";
 
 import {
   registerUser,
@@ -9,22 +9,13 @@ import {
   logoutUser,
   resetPassword,
 } from "../services/authService";
-import {auth, firestore} from "../firebaseConfig"; // ajuste o caminho conforme necessário
-import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import {auth, firestore} from "../firebaseConfig";
+import {doc, serverTimestamp, updateDoc} from "firebase/firestore";
+import {
+  getFirebasePasswordResetErrorMessage,
+} from "../utils/firebaseErrorMessage"; 
+import {User} from "../types/types"; 
 
-export interface User {
-  id: string;
-  uid: string;
-  name: string;
-  email: string | null;
-  photoUrl?: string;
-  phone?: string;
-  license?: string;
-  licenseExpiry?: string;
-  vehicle?: string;
-  plate?: string;
-  profileImage?: string;
-}
 
 export interface AuthContextData {
   user: User | null;
@@ -63,6 +54,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
           name: firebaseUser.displayName || "",
           email: firebaseUser.email || "",
           photoUrl: firebaseUser.photoURL || "",
+          phone: "", 
+          license: "", 
+          licenseExpiry: "", 
+          vehicle: "", 
+          plate: "", 
         };
         console.log("Definindo usuário no estado:", userData);
         setUser(userData);
@@ -93,9 +89,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
       console.log("Cadastro bem-sucedido:", !!newUser);
 
-      // Forçamos o redirecionamento explícito após cadastro
-      // Pequeno delay para garantir que o Firebase tenha tempo de processar
-      // e o listener onAuthStateChanged seja chamado antes
+      Toast.show({
+        type: "success",
+        text1: "Cadastro Realizado",
+        text2: "Bem-vindo à nossa plataforma!",
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+
       setTimeout(() => {
         router.replace("/(auth)/home");
       }, 500);
@@ -121,9 +122,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
       console.log("Login bem-sucedido:", !!loggedUser);
 
-      // Forçamos o redirecionamento explícito após login
-      // Pequeno delay para garantir que o Firebase tenha tempo de processar
-      // e o listener onAuthStateChanged seja chamado antes
+      Toast.show({
+        type: "success",
+        text1: "Login Realizado",
+        text2: "Bem-vindo de volta!",
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+
       setTimeout(() => {
         router.replace("/(auth)/home");
       }, 500);
@@ -149,7 +155,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
       console.log("Logout bem-sucedido");
 
-      // Redirecionamento explícito após logout
+      Toast.show({
+        type: "success",
+        text1: "Logout Realizado",
+        text2: "Você saiu da conta com sucesso.",
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+
       router.replace("/(public)/login");
     } catch (error) {
       console.error("Erro no logout:", error);
@@ -166,6 +179,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     try {
       const result = await resetPassword(email);
       console.log("Resultado do reset de senha:", result);
+
+      if (result.success) {
+        Toast.show({
+          type: "success",
+          text1: "Redefinição de Senha",
+          text2: "Link de redefinição enviado para seu email.",
+          visibilityTime: 4000,
+          autoHide: true,
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Erro na Redefinição",
+          text2: getFirebasePasswordResetErrorMessage(result.error || ""),
+          visibilityTime: 4000,
+          autoHide: true,
+        });
+      }
+
       return result;
     } catch (error) {
       console.error("Erro ao solicitar reset de senha:", error);
@@ -177,57 +209,50 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       setLoading(false);
     }
   };
-  
+
   const updateUserProfile = async (userData: Partial<User>) => {
     if (!user || !auth.currentUser) {
       throw new Error("Usuário não autenticado");
     }
 
-    setLoading(true);
-
     try {
-      const currentUser = auth.currentUser;
-      const updates: Partial<User> = {};
-
-      if (userData.name && userData.name !== user.name) {
-        await updateProfile(currentUser, {displayName: userData.name});
-        updates.name = userData.name;
-      }
-
-      if (userData.email && userData.email !== user.email) {
-        await updateEmail(currentUser, userData.email);
-        updates.email = userData.email;
-      }
-
-      if (
-        userData.profileImage &&
-        userData.profileImage !== user.profileImage
-      ) {
-        await updateProfile(currentUser, {photoURL: userData.profileImage});
-        updates.photoUrl = userData.profileImage;
-        updates.profileImage = userData.profileImage;
+      if (userData.profileImage || userData.photoURL) {
+        await updateProfile(auth.currentUser, {
+          photoURL: userData.profileImage || userData.photoURL,
+        });
       }
 
       const userDocRef = doc(firestore, "users", user.id);
-
-      const firestoreUpdates: Record<string, any> = {
+      await updateDoc(userDocRef, {
+        ...userData,
         updatedAt: serverTimestamp(),
-      };
-
-      Object.keys(userData).forEach((key) => {
-        if (key !== "id" && userData[key as keyof User] !== undefined) {
-          firestoreUpdates[key as keyof User] = userData[key as keyof User]!;
-        }
       });
 
-      await updateDoc(userDocRef, firestoreUpdates);
+      setUser((prevUser) =>
+        prevUser
+          ? {
+              ...prevUser,
+              ...userData,
+              photoURL: userData.profileImage || userData.photoURL,
+            }
+          : null
+      );
 
-      setUser((prev) => (prev ? {...prev, ...updates, ...userData} : null));
+      Toast.show({
+        type: "success",
+        text1: "Perfil Atualizado",
+        text2: "Suas informações foram atualizadas.",
+      });
     } catch (error) {
       console.error("Erro ao atualizar perfil:", error);
+
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "Não foi possível atualizar o perfil",
+      });
+
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 

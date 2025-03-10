@@ -10,6 +10,10 @@ export const loadsApi = {
   getById: (id) => api.get(`/loads/${id}`),
   updateStatus: (id, status) => api.patch(`/loads/${id}`, { status }),
   getByStatus: (status) => api.get(`/loads?status=${status}`),
+  getCompletedLoads: async () => {
+    const response = await api.get('/loads?status=completed');
+    return response;
+  },
 
   uploadDocument: (loadId, documentData) => {
     const newDoc = {
@@ -58,7 +62,8 @@ export const notificationsApi = {
 
 export const driversApi = {
   getById: (id) => api.get(`/drivers/${id}`),
-  update: (id, data) => api.patch(`/drivers/${id}`, data)
+  update: (id, data) => api.patch(`/drivers/${id}`, data),
+  updatePhoto: (id, photoURL) => api.patch(`/drivers/${id}`, { photoURL })
 };
 
 export default api;

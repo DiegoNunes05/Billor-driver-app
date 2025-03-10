@@ -12,7 +12,7 @@ import {
 import {Ionicons, MaterialIcons} from "@expo/vector-icons";
 import {router} from "expo-router";
 import {Notification, useNotification} from "@/contexts/NotificationContext";
-import {SafeAreaView} from "react-native-safe-area-context";
+import Header from "@/components/Header";
 
 export default function NotificationsScreen() {
   const {
@@ -77,13 +77,11 @@ export default function NotificationsScreen() {
   };
 
   const handleNotificationPress = (notification: Notification) => {
-    // Marcar como lida ao clicar
     if (!notification.read) {
       markAsRead(notification.id);
     }
   };
 
-  // Filtrar notificações
   const filteredNotifications = notifications.filter((notification) => {
     if (filterType === "all") return true;
     if (filterType === "unread") return !notification.read;
@@ -91,7 +89,6 @@ export default function NotificationsScreen() {
     return true;
   });
 
-  // Definir o ícone com base no tipo de notificação
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "new_load":
@@ -160,7 +157,8 @@ export default function NotificationsScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <Header />
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
@@ -168,7 +166,6 @@ export default function NotificationsScreen() {
         >
           <Ionicons name="arrow-back" size={24} color="#324c6e" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Notificações</Text>
         <TouchableOpacity
           style={styles.markAllButton}
           onPress={handleMarkAllAsRead}
@@ -255,7 +252,7 @@ export default function NotificationsScreen() {
           }
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 

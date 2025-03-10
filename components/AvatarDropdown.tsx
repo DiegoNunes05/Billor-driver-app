@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from "react";
+import React, {useState} from "react";
 import {
   View,
   Text,
@@ -7,12 +7,14 @@ import {
   Modal,
   Pressable,
   Platform,
+  Image,
 } from "react-native";
 import {Ionicons} from "@expo/vector-icons";
 import {router} from "expo-router";
 
 interface User {
   name: string | null;
+  photoURL?: string; 
 }
 
 interface AvatarDropdownProps {
@@ -41,7 +43,7 @@ const AvatarDropdown = ({user, logout}: AvatarDropdownProps) => {
 
   const handleProfile = () => {
     setIsOpen(false);
-    router.push("/(auth)/profile");
+    router.push("/(auth)/person");
   };
 
   const handleLogout = async () => {
@@ -64,7 +66,11 @@ const AvatarDropdown = ({user, logout}: AvatarDropdownProps) => {
         style={styles.avatarContainer}
         onPress={() => setIsOpen(true)}
       >
-        <Text style={styles.avatarText}>{getUserInitials()}</Text>
+        {user?.photoURL ? (
+          <Image source={{uri: user.photoURL}} style={styles.avatarImage} />
+        ) : (
+          <Text style={styles.avatarText}>{getUserInitials()}</Text>
+        )}
       </TouchableOpacity>
 
       <Modal
@@ -126,12 +132,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     justifyContent: "center",
     alignItems: "center",
+    overflow: "hidden", // Importante para manter a imagem circular
+  },
+  avatarImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover", // Mantém a proporção da imagem
   },
   avatarText: {
     color: "#0D47A1",
     fontWeight: "bold",
     fontSize: 14,
   },
+  // Restante dos estilos permanece igual
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.1)",

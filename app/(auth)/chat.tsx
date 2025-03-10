@@ -1,4 +1,3 @@
-// (auth)/chat.tsx ou (auth)/chat-history.tsx
 import React, {useState, useEffect, useRef} from "react";
 import {
   View,
@@ -18,27 +17,8 @@ import {router} from "expo-router";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {useAuth} from "@/hooks/useAuth";
 import {messagesApi} from "@/services/api";
-
-// Interfaces para tipagem
-interface Message {
-  id: string;
-  senderId: string;
-  receiverId: string;
-  text: string;
-  receiverName?: string;
-  timestamp: string;
-  read: boolean;
-  userName?: string;
-  conversationId: string;
-}
-
-interface Conversation {
-  id: string;
-  title: string;
-  lastMessage: string;
-  timestamp: string;
-  unreadCount: number;
-}
+import { Conversation, Message } from "@/types/types";
+import Header from "@/components/Header";
 
 export default function ChatScreen() {
   const {user} = useAuth();
@@ -59,15 +39,12 @@ export default function ChatScreen() {
 
       const userId = '1'
 
-      // Obter todas as mensagens do usuário
       const response = await messagesApi.getByDriver(userId);
       const allMessages = response.data;
 
-      // Agrupar mensagens por remetente/destinatário para formar conversas
       const conversationsMap = new Map();
 
       allMessages.forEach((msg: Message) => {
-        // Determinar o ID da outra parte da conversa (não o usuário atual)
         const otherPartyId =
           msg.senderId === user.uid ? msg.receiverId : msg.senderId;
         const otherPartyName =
@@ -84,17 +61,14 @@ export default function ChatScreen() {
           });
         }
 
-        // Adicionar mensagem à conversa
         const conversation = conversationsMap.get(otherPartyId);
         conversation.messages.push(msg);
 
-        // Contar mensagens não lidas
         if (!msg.read && msg.receiverId === user.uid) {
           conversation.unreadCount += 1;
         }
       });
 
-      // Processar as conversas para extrair última mensagem e timestamp
       const conversations = Array.from(conversationsMap.values()).map(
         (conv) => {
           const sortedMessages = conv.messages.sort(
@@ -134,12 +108,10 @@ export default function ChatScreen() {
     try {
       setLoading(true);
 
-      // Usar o novo método para buscar todas as mensagens
-      const response = await messagesApi.getAllUserMessages("1"); // Use "1" para testes
+      const response = await messagesApi.getAllUserMessages("1"); 
 
       console.log("Total de mensagens:", response.data.length);
 
-      // Filtrar mensagens pela conversationId ou pelo par senderId/receiverId
       const chatMessages = response.data.filter(
         (msg: Message) =>
           msg.conversationId === "support-1" ||
@@ -149,7 +121,6 @@ export default function ChatScreen() {
 
       console.log("Mensagens da conversa:", chatMessages.length);
 
-      // Ordenar por timestamp
       chatMessages.sort(
         (a: Message, b: Message) =>
           new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
@@ -157,7 +128,6 @@ export default function ChatScreen() {
 
       setMessages(chatMessages);
 
-      // Marcar mensagens como lidas
       const unreadMessages = chatMessages.filter(
         (msg: Message) => !msg.read && msg.receiverId === "1"
       );
@@ -166,7 +136,6 @@ export default function ChatScreen() {
       );
       await Promise.all(markReadPromises);
 
-      // Atualizar unreadCount na conversa
       setConversations((prev) =>
         prev.map((conv) =>
           conv.id === chatId ? {...conv, unreadCount: 0} : conv
@@ -214,13 +183,10 @@ export default function ChatScreen() {
       };
 
       await messagesApi.send(newMessage);
-
-      // Atualizar estado local para feedback imediato
       setMessages((prev) => [...prev, newMessage]);
 
       setMessageText("");
 
-      // Scroll para a última mensagem
       setTimeout(() => {
         messagesListRef.current?.scrollToEnd({animated: true});
       }, 100);
@@ -354,7 +320,8 @@ export default function ChatScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <Header />
       <View style={styles.header}>
         {selectedChat ? (
           <>
@@ -519,7 +486,7 @@ export default function ChatScreen() {
           </View>
         </KeyboardAvoidingView>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 

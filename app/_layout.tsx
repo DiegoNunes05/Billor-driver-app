@@ -6,7 +6,7 @@ import {Ionicons} from "@expo/vector-icons";
 import {View, ActivityIndicator} from "react-native";
 import {ChatProvider} from "@/contexts/ChatContext";
 import {NotificationProvider} from "@/contexts/NotificationContext";
-import {ToastProvider} from "@/contexts/ToastContext";
+import Toast from "react-native-toast-message";
 
 export default function RootLayout() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -33,23 +33,26 @@ export default function RootLayout() {
         <ActivityIndicator size="large" color="#0D47A1" />
       </View>
     );
-  }
-
+  } 
+  
   return (
     <AuthProvider>
-      <ToastProvider>
-        <NotificationProvider>
-          <ChatProvider>
-            <Stack screenOptions={{headerShown: false}}>
-              <Stack.Screen name="home" />
-              <Stack.Screen name="index" />
-              <Stack.Screen name="onboarding" />
-              <Stack.Screen name="(auth)" />
-              <Stack.Screen name="(public)" />
-            </Stack>
-          </ChatProvider>
-        </NotificationProvider>
-      </ToastProvider>
+      <NotificationProvider>
+        <ChatProvider>
+          <Stack screenOptions={{headerShown: false}}>
+            <Stack.Screen name="home" />
+            <Stack.Screen name="index" />
+            <Stack.Screen name="onboarding" />
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(public)" />
+          </Stack>
+        </ChatProvider>
+      </NotificationProvider>
+      <Toast
+        position="top"
+        topOffset={65}
+        visibilityTime={2000}
+      />
     </AuthProvider>
   );
 }
