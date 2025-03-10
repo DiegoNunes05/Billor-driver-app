@@ -16,7 +16,7 @@ import ChatButton from "@/components/ChatButton";
 import { useAuth } from "@/hooks/useAuth";
 import { loadsApi } from "@/services/api";
 import { Load } from "@/types/types";
-import LineBillor from "@/components/lineBillor";
+import LineBillor from "@/components/LineBillor";
 
 const {width} = Dimensions.get("window");
 const imageSize = Platform.OS === "android" ? Math.min(width * 0.9, 280) : 320;
