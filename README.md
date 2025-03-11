@@ -41,7 +41,7 @@ Descubra o IP da sua máquina local:
 - Localize o endereço IP da sua rede local (geralmente começa com 192.168.x.x)
 - Adicione ao seu .env:
 ```
-API_URL=http://SEU_IP_LOCAL:3000
+API_URL=http://SEU_IP_LOCAL:3000  json-server --watch db.json --port 3000 para rodar o db.json
 ```
 
 #### Exemplo Completo de .env
@@ -108,7 +108,7 @@ billor-driver-app/
 Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
 ## 📞 Contato
-Seu Nome - seu-email@exemplo.com
+Diego Nunes - diegonunesabc@gmail.com
 
 Link do Projeto: [https://github.com/DiegoNunes05/billor-driver-app](https://github.com/DiegoNunes05/Billor-driver-app)
 
